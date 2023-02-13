@@ -59,7 +59,7 @@ def main():
         p.progress(progress)
 
         # one progress step should be 90/len(chunks).
-        progress_step = 80 / len(chunks)
+        progress_step = 90 / (len(chunks) + 1)
 
         # summarize_audio_transcript_chunks yields chunks. Get each one and write it.
         for chunk in summarize_audio_transcript_chunks(chunks, "", chunk_len_mins):
