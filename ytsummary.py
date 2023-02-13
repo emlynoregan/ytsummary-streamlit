@@ -7,6 +7,7 @@ import os
 import json
 import openai
 import streamlit as st
+from tmw import tmwcheck
 
 # OpenAI API Key
 openai.api_key = st.secrets["OPENAIKEY"]
@@ -30,7 +31,11 @@ def get_video_id_from_video_id_or_url(video_id_or_url):
         return result
 
 def main():
+    info = tmwcheck()
+    user_name = (info.get('user') or {}).get('user_name')
+
     st.title ("Youtube Video Summarizer")
+    st.write(f"Hello {user_name}!")
 
     video_id_or_url = st.text_input("Enter the url or id of the video to summarize")
 
