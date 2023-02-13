@@ -1,15 +1,17 @@
 import streamlit as st
 import webbrowser
 import requests
-from streamlit_cookies_manager import EncryptedCookieManager
+# from streamlit_cookies_manager import EncryptedCookieManager
 
-cookies = EncryptedCookieManager(
-    prefix = st.secrets["COOKIES_PREFIX"],
-    password = st.secrets["COOKIES_PASSWORD"]
-)
+# st.write(st.user)
 
-if not cookies.ready():
-    st.stop()
+# cookies = EncryptedCookieManager(
+#     prefix = st.secrets["COOKIES_PREFIX"],
+#     password = st.secrets["COOKIES_PASSWORD"]
+# )
+
+# if not cookies.ready():
+#     st.stop()
 
 C_METALWIZARD_URL = "https://themetalwizard.net"
 C_API_URL = "https://qiuh5okg6pk3ie6m43n36s66vi0quait.lambda-url.us-east-1.on.aws/info"
@@ -27,24 +29,29 @@ def tmwcheck():
     # st.write(type(access_token))
     # raise Exception("xxx")
 
-    # if no access_token, then get access_token from the state
-    if not access_token:
-        # st.write(st.session_state)
-        # access_token = st.session_state.get("access_token")
-        access_token = cookies.get("access_token")
-    else:
-        # remove the access_token from the querystring
-        # st.write(access_token)
-        st.experimental_set_query_params(access_token=None)
+    #** I removed all storage of the access_token in the state or cookies because all methods either don't
+    # survive a refresh or are global to all users. I'm just leaving the token in the querystring for now.
+
+    # # if no access_token, then get access_token from the state
+    # if not access_token:
+    #     st.write('looking in cookies')
+    #     # st.write(st.session_state)
+    #     # access_token = st.session_state.get("access_token")
+    #     access_token = cookies.get("access_token")
+    #     st.write(access_token)
+    # else:
+    #     # remove the access_token from the querystring
+    #     # st.write(access_token)
+    #     st.experimental_set_query_params(access_token=None)
 
     if not access_token:
-        webbrowser.open(C_METALWIZARD_URL)
-        raise Exception("You must login to The Metal Wizard to use this app. (1)")
+        # webbrowser.open(C_METALWIZARD_URL)
+        raise Exception("You must login to https://themetalwizard.net to use this app. (1)")
 
-    # save the token in the state
-    # st.session_state["access_token"] = access_token
-    cookies["access_token"] = access_token
-    cookies.save()
+    # # save the token in the state
+    # # st.session_state["access_token"] = access_token
+    # cookies["access_token"] = access_token
+    # cookies.save()
 
     # st.write(access_token)
 
@@ -52,9 +59,9 @@ def tmwcheck():
     r = requests.get(C_API_URL, headers={"Authorization": f"Bearer {access_token}"})
 
     if r.status_code != 200:
-        st.write(f"Error: {r.status_code} {r.text}")
-        webbrowser.open(C_METALWIZARD_URL)
-        raise Exception("You must login to The Metal Wizard to use this app. (2)")
+        # st.write(f"Error: {r.status_code} {r.text}")
+        # webbrowser.open(C_METALWIZARD_URL)
+        raise Exception("You must login to https://themetalwizard.net to use this app. (2)")
     
     response_json = r.json()
     
@@ -65,8 +72,8 @@ def tmwcheck():
     tenants = (response_json.get("info") or {}).get("tenants") or {}
 
     if expected_tenant_id not in tenants:
-        webbrowser.open(C_METALWIZARD_URL)
-        raise Exception("You must login to The Metal Wizard to use this app. (3)")
+        # webbrowser.open(C_METALWIZARD_URL)
+        raise Exception("You must login to https://themetalwizard.net to use this app. (3)")
 
     # here we're good.
 
