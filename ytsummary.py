@@ -14,18 +14,25 @@ openai.api_key = st.secrets["OPENAIKEY"]
 def get_video_id_from_video_id_or_url(video_id_or_url):
     # a youtube video id is 11 characters long
     # if the video id is longer than that, then it's a url
-    if len(video_id_or_url) > 11:
+
+    result = video_id_or_url
+
+    # remove any query parameters
+    if "?" in video_id_or_url:
+        result = video_id_or_url.split("?")[0]
+
+    if len(result) > 11:
         # it's a url
         # the video id is the last 11 characters
-        return video_id_or_url[-11:]
+        return result[-11:]
     else:
         # it's a video id
-        return video_id_or_url
+        return result
 
 def main():
     st.title ("Youtube Video Summarizer")
 
-    video_id_or_url = st.text_input("Enter the video id or url of the video to summarize")
+    video_id_or_url = st.text_input("Enter the url or id of the video to summarize")
 
     chunk_len_mins = st.number_input("Enter the length of the chunks to summarize in minutes", min_value=1, max_value=60, value=10)
 
