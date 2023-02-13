@@ -18,9 +18,9 @@ def get_video_id_from_video_id_or_url(video_id_or_url):
 
     result = video_id_or_url
 
-    # remove any query parameters
-    if "?" in video_id_or_url:
-        result = video_id_or_url.split("?")[0]
+    # remove any extra query parameters
+    if "&" in video_id_or_url:
+        result = video_id_or_url.split("&")[0]
 
     if len(result) > 11:
         # it's a url
@@ -43,6 +43,8 @@ def main():
 
     if video_id_or_url:
         video_id = get_video_id_from_video_id_or_url(video_id_or_url)
+        
+        # st.write(f"video_id: {video_id}")
 
         transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=("en", "en-US", "en-GB"))
 
