@@ -38,10 +38,10 @@ def main():
     except UnauthorizedError as e:
         auth_url = e.get_auth_url(tenant_id)
 
-        st.write(f"Unauthorized. Please click the link below to authorize this app.")
+        st.write(f"Please click the link below to sign in.")
 
         # add a link that will open the auth url in a new tab
-        st.markdown(f"[Authorize this app]({auth_url})")
+        st.markdown(f"[Sign in]({auth_url})")
 
         return
     
