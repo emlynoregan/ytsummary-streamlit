@@ -7,7 +7,7 @@ import os
 import json
 import openai
 import streamlit as st
-from tmw import tmwcheck
+from tmw import tmwcheck, UnauthorizedError
 
 # OpenAI API Key
 openai.api_key = st.secrets["OPENAIKEY"]
@@ -31,7 +31,22 @@ def get_video_id_from_video_id_or_url(video_id_or_url):
         return result
 
 def main():
-    info = tmwcheck()
+    tenant_id = st.secrets["TENANT_ID"]
+
+    try:
+        info = tmwcheck()
+    except UnauthorizedError as e:
+        auth_url = e.get_auth_url(tenant_id)
+
+        st.write(f"Unauthorized. Please click the link below to authorize this app.")
+
+        # add a link that will open the auth url in a new tab
+        st.markdown(f"[Authorize this app]({auth_url})")
+
+        return
+    
+    # here we know the user is authorized
+
     user_name = (info.get('user') or {}).get('user_name')
 
     st.title ("Youtube Video Summarizer")

@@ -15,6 +15,14 @@ import requests
 
 C_METALWIZARD_URL = "https://themetalwizard.net"
 C_API_URL = "https://qiuh5okg6pk3ie6m43n36s66vi0quait.lambda-url.us-east-1.on.aws/info"
+C_AUTH_URL_TEMPLATE = "https://themetalwizard.net/launch/{tenant_id}"
+
+class UnauthorizedError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+    def get_auth_url(self, tenant_id):
+        return C_AUTH_URL_TEMPLATE.format(tenant_id=tenant_id)
 
 def tmwcheck():
     # get the querystring param "access_token" if it exists
@@ -45,8 +53,9 @@ def tmwcheck():
     #     st.experimental_set_query_params(access_token=None)
 
     if not access_token:
-        # webbrowser.open(C_METALWIZARD_URL)
-        raise Exception("You must login to https://themetalwizard.net to use this app. (1)")
+        raise UnauthorizedError("You must login to https://themetalwizard.net to use this app. (1)")
+        # # webbrowser.open(C_METALWIZARD_URL)
+        # raise Exception("You must login to https://themetalwizard.net to use this app. (1)")
 
     # # save the token in the state
     # # st.session_state["access_token"] = access_token
@@ -59,9 +68,10 @@ def tmwcheck():
     r = requests.get(C_API_URL, headers={"Authorization": f"Bearer {access_token}"})
 
     if r.status_code != 200:
-        # st.write(f"Error: {r.status_code} {r.text}")
-        # webbrowser.open(C_METALWIZARD_URL)
-        raise Exception("You must login to https://themetalwizard.net to use this app. (2)")
+        raise UnauthorizedError("You must login to https://themetalwizard.net to use this app. (2)")
+        # # st.write(f"Error: {r.status_code} {r.text}")
+        # # webbrowser.open(C_METALWIZARD_URL)
+        # raise Exception("You must login to https://themetalwizard.net to use this app. (2)")
     
     response_json = r.json()
     
@@ -72,8 +82,9 @@ def tmwcheck():
     tenants = (response_json.get("info") or {}).get("tenants") or {}
 
     if expected_tenant_id not in tenants:
-        # webbrowser.open(C_METALWIZARD_URL)
-        raise Exception("You must login to https://themetalwizard.net to use this app. (3)")
+        raise UnauthorizedError("You must login to https://themetalwizard.net to use this app. (3)")
+        # # webbrowser.open(C_METALWIZARD_URL)
+        # raise Exception("You must login to https://themetalwizard.net to use this app. (3)")
 
     # here we're good.
 
