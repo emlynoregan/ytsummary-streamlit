@@ -35,6 +35,7 @@ def main():
 
     authorized = False
     unauth_error = None
+    info = None
     try:
         info = tmwcheck()
         # tmwcheck_tenant(tenant_id, info)
@@ -43,6 +44,19 @@ def main():
     except UnauthorizedError as e:
         unauth_error = e
 
+    st.title ("Youtube Video Summarizer")
+
+    user = None
+    if info and info.get("user"):
+        user = info.get("user")
+        # here we know the user is authorized
+        user_name = (user or {}).get('user_name')
+        user_id = (user or {}).get('user_id')
+
+        st.write(f"Hello {user_name}!")
+    else:
+        st.write("Hello mysterious stranger!")
+    
     if not authorized:
         # the user is not authorized
 
@@ -50,23 +64,18 @@ def main():
 
         public_signup_url = unauth_error.get_sign_up_url()
 
-        st.title ("Youtube Video Summarizer")
+        if user:
+            st.write ("You are not authorized to use this app.")
 
-        st.write ("You must sign in to use this app.")
+            st.markdown(f"[Click here for authorization]({public_signup_url})")
+        else:
+            st.markdown(f"[Click here to sign in]({public_signup_url})")
 
-        st.markdown(f"Click here to [Sign in]({auth_url})")
-        st.markdown(f"Click here to [Sign up]({public_signup_url})")
+        # st.markdown(f"Click here to [Sign in]({auth_url})")
+        # st.markdown(f"Click here to [Sign up]({public_signup_url})")
 
-        return
+        st.stop()
     
-    # here we know the user is authorized
-    user_name = (info.get('user') or {}).get('user_name')
-    user_id = (info.get('user') or {}).get('user_id')
-
-    st.title ("Youtube Video Summarizer")
-    st.write(f"Hello {user_name}!")
-
-
     is_private = has_scope(tenant_id, "private", info)
 
     api_key = None
