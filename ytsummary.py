@@ -75,7 +75,7 @@ def main():
         password = st.secrets["COOKIES_PASSWORD"]
     )
 
-    if not cookies.ready:
+    if not cookies.ready():
         st.stop()
 
     # users that are not private need to provide openai keys
@@ -133,7 +133,7 @@ def main():
     except openai.error.AuthenticationError as e:
         cookies["openaikey"] = ""
         cookies.save()
-        raise e
+        st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
