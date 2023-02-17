@@ -17,6 +17,10 @@ C_METALWIZARD_URL = "https://themetalwizard.net"
 C_API_URL = "https://qiuh5okg6pk3ie6m43n36s66vi0quait.lambda-url.us-east-1.on.aws/info"
 C_AUTH_URL_TEMPLATE = "https://themetalwizard.net/launch/{tenant_id}"
 
+def get_sign_up_url():
+    public_invite_url = st.secrets["PUBLIC_INVITE_URL"]
+    return public_invite_url
+
 class UnauthorizedError(Exception):
     def __init__(self, message):
         self.message = message
@@ -24,10 +28,6 @@ class UnauthorizedError(Exception):
     def get_auth_url(self, tenant_id):
         return C_AUTH_URL_TEMPLATE.format(tenant_id=tenant_id)
     
-    def get_sign_up_url(self):
-        public_invite_url = st.secrets["PUBLIC_INVITE_URL"]
-        return public_invite_url
-
 def tmwcheck():
     # get the querystring param "access_token" if it exists
     access_token = st.experimental_get_query_params().get("access_token", None)

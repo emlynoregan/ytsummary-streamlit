@@ -7,7 +7,7 @@ import os
 import json
 import openai
 import streamlit as st
-from tmw import tmwcheck, tmwcheck_tenant, UnauthorizedError, has_scope, check_scope
+from tmw import tmwcheck, tmwcheck_tenant, UnauthorizedError, has_scope, check_scope, get_sign_up_url
 from streamlit_cookies_manager import EncryptedCookieManager
 
 
@@ -46,6 +46,8 @@ def main():
 
     st.title ("Youtube Video Summarizer")
 
+    public_signup_url = get_sign_up_url()
+
     user = None
     if info and info.get("user"):
         user = info.get("user")
@@ -60,9 +62,7 @@ def main():
     if not authorized:
         # the user is not authorized
 
-        auth_url = unauth_error.get_auth_url(tenant_id)
-
-        public_signup_url = unauth_error.get_sign_up_url()
+        # auth_url = unauth_error.get_auth_url(tenant_id)
 
         if user:
             st.write ("You are not authorized to use this app.")
