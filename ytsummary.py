@@ -53,7 +53,7 @@ def main():
         user_name = (user or {}).get('user_name')
         user_id = (user or {}).get('user_id')
 
-        st.write(f"Hello {user_name}!")
+        st.markdown(f"Hello {user_name}! [not you?]({public_signup_url})")
     else:
         st.write("Hello mysterious stranger!")
     
