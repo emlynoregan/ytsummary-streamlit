@@ -85,6 +85,10 @@ def main():
         api_key = cookies.get("openaikey")
 
     if not api_key:
+        st.write("You need to provide an OpenAI API Key to use this app.")
+
+        st.markdown("You can get the key from [OpenAI](https://openai.com/).")
+
         api_key = st.text_input("Enter your OpenAI API Key")
 
         if api_key:
