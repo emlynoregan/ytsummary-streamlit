@@ -47,7 +47,7 @@ def tmwcheck():
     
     response_json = r.json()
 
-    st.write(response_json)
+    # st.write(response_json)
 
     return response_json
 
