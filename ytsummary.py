@@ -46,7 +46,6 @@ def main():
 
     st.title ("Youtube Video Summarizer")
 
-    public_signup_url = get_sign_up_url()
 
     user = None
     if info and info.get("user"):
@@ -55,7 +54,9 @@ def main():
         user_name = (user or {}).get('user_name')
         user_id = (user or {}).get('user_id')
 
-        st.markdown(f"Hello {user_name}! [not you?]({public_signup_url})")
+        public_signup_url_force = get_sign_up_url(True)
+
+        st.markdown(f"Hello {user_name}! [not you?]({public_signup_url_force})")
     else:
         st.write("Hello mysterious stranger!")
     
@@ -63,6 +64,8 @@ def main():
         # the user is not authorized
 
         # auth_url = unauth_error.get_auth_url(tenant_id)
+
+        public_signup_url = get_sign_up_url()
 
         if user:
             st.write ("You are not authorized to use this app.")

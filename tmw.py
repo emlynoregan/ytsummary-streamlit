@@ -17,8 +17,10 @@ C_METALWIZARD_URL = "https://themetalwizard.net"
 C_API_URL = "https://qiuh5okg6pk3ie6m43n36s66vi0quait.lambda-url.us-east-1.on.aws/info"
 C_AUTH_URL_TEMPLATE = "https://themetalwizard.net/launch/{tenant_id}"
 
-def get_sign_up_url():
+def get_sign_up_url(force_sign_in=False):
     public_invite_url = st.secrets["PUBLIC_INVITE_URL"]
+    if force_sign_in:
+        public_invite_url += "?force_sign_in=true"
     return public_invite_url
 
 class UnauthorizedError(Exception):
