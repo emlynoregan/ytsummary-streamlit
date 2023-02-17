@@ -90,6 +90,7 @@ def main():
         if api_key:
             cookies["openaikey"] = api_key
             cookies.save()
+            st.experimental_rerun()
 
     if not api_key:
         st.stop()
