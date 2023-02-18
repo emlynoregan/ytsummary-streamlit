@@ -95,6 +95,8 @@ def auth_with_tmw():
         else:
             st.markdown(f"[Click here to sign in]({public_signup_url})")
 
+        st.write("*Are you using this app on an android device? If you clicked a link in Messenger to get here, and the link above wont work for you, you may need to switch to Chrome.*")
+
         st.stop()
     
     is_private = has_scope(tenant_id, "private", info)
