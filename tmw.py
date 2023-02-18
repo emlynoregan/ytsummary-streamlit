@@ -1,17 +1,6 @@
 import streamlit as st
-import webbrowser
 import requests
-# from streamlit_cookies_manager import EncryptedCookieManager
-
-# st.write(st.user)
-
-# cookies = EncryptedCookieManager(
-#     prefix = st.secrets["COOKIES_PREFIX"],
-#     password = st.secrets["COOKIES_PASSWORD"]
-# )
-
-# if not cookies.ready():
-#     st.stop()
+from streamlit_cookies_manager import EncryptedCookieManager
 
 C_METALWIZARD_URL = "https://themetalwizard.net"
 C_API_URL = "https://qiuh5okg6pk3ie6m43n36s66vi0quait.lambda-url.us-east-1.on.aws/info"
@@ -73,3 +62,71 @@ def check_scope(tenant_id, scope, response_json):
 
     return response_json    
 
+def auth_with_tmw():
+    tenant_id = st.secrets["TENANT_ID"]
+
+    authorized = False
+    info = None
+    try:
+        info = tmwcheck()
+        check_scope(tenant_id, "public", info)
+        authorized = True
+    except UnauthorizedError as e:
+        pass
+
+    user = info and info.get("user")
+    if user:
+        user_name = (user or {}).get('user_name')
+        user_id = (user or {}).get('user_id')
+
+        public_signup_url_force = get_sign_up_url(True)
+
+        st.markdown(f"Hello {user_name}! [not you?]({public_signup_url_force})")
+    else:
+        st.write("Hello mysterious stranger!")
+    
+    if not authorized:
+        public_signup_url = get_sign_up_url()
+
+        if user:
+            st.write ("You are not authorized to use this app.")
+
+            st.markdown(f"[Click here for authorization]({public_signup_url})")
+        else:
+            st.markdown(f"[Click here to sign in]({public_signup_url})")
+
+        st.stop()
+    
+    is_private = has_scope(tenant_id, "private", info)
+
+    api_key = None
+    cookies = EncryptedCookieManager(
+        prefix = f"{user_id}/scm",
+        password = st.secrets["COOKIES_PASSWORD"]
+    )
+
+    if not cookies.ready():
+        st.stop()
+
+    # users that are not private need to provide openai keys
+    if is_private:
+        api_key = st.secrets["OPENAIKEY"]
+    else:
+        api_key = cookies.get("openaikey")
+
+    if not api_key:
+        st.write("You need to provide an OpenAI API Key to use this app.")
+
+        st.markdown("You can get the key from [OpenAI](https://openai.com/).")
+
+        api_key = st.text_input("Enter your OpenAI API Key")
+
+        if api_key:
+            cookies["openaikey"] = api_key
+            cookies.save()
+            st.experimental_rerun()
+
+    if not api_key:
+        st.stop()
+    else:
+        return api_key, cookies

@@ -1,14 +1,10 @@
 # In this program we will read the transcript of a youtube video and summarize it
 
 from youtube_transcript_api import YouTubeTranscriptApi
-from utils import get_chunks_from_transcript, summarize_audio_transcript_chunks, set_diagnostics
-import argparse
-import os
-import json
+from utils import get_chunks_from_transcript, summarize_audio_transcript_chunks
 import openai
 import streamlit as st
-from tmw import tmwcheck, tmwcheck_tenant, UnauthorizedError, has_scope, check_scope, get_sign_up_url
-from streamlit_cookies_manager import EncryptedCookieManager
+from tmw import tmwcheck, UnauthorizedError, has_scope, check_scope, get_sign_up_url, auth_with_tmw
 
 
 # OpenAI API Key
@@ -31,89 +27,13 @@ def get_video_id_from_video_id_or_url(video_id_or_url):
         return result
 
 def main():
-    tenant_id = st.secrets["TENANT_ID"]
-
-    authorized = False
-    unauth_error = None
-    info = None
-    try:
-        info = tmwcheck()
-        # tmwcheck_tenant(tenant_id, info)
-        check_scope(tenant_id, "public", info)
-        authorized = True
-    except UnauthorizedError as e:
-        unauth_error = e
-
     st.title ("Youtube Video Summarizer")
 
+    api_key, cookies = auth_with_tmw()
 
-    user = None
-    if info and info.get("user"):
-        user = info.get("user")
-        # here we know the user is authorized
-        user_name = (user or {}).get('user_name')
-        user_id = (user or {}).get('user_id')
+    openai.api_key = api_key
 
-        public_signup_url_force = get_sign_up_url(True)
-
-        st.markdown(f"Hello {user_name}! [not you?]({public_signup_url_force})")
-    else:
-        st.write("Hello mysterious stranger!")
-    
-    if not authorized:
-        # the user is not authorized
-
-        # auth_url = unauth_error.get_auth_url(tenant_id)
-
-        public_signup_url = get_sign_up_url()
-
-        if user:
-            st.write ("You are not authorized to use this app.")
-
-            st.markdown(f"[Click here for authorization]({public_signup_url})")
-        else:
-            st.markdown(f"[Click here to sign in]({public_signup_url})")
-
-        # st.markdown(f"Click here to [Sign in]({auth_url})")
-        # st.markdown(f"Click here to [Sign up]({public_signup_url})")
-
-        st.stop()
-    
-    is_private = has_scope(tenant_id, "private", info)
-
-    api_key = None
-    cookies = EncryptedCookieManager(
-        prefix = f"{user_id}/scm",
-        password = st.secrets["COOKIES_PASSWORD"]
-    )
-
-    if not cookies.ready():
-        st.stop()
-
-    # users that are not private need to provide openai keys
-    if is_private:
-        api_key = st.secrets["OPENAIKEY"]
-    else:
-        api_key = cookies.get("openaikey")
-
-    if not api_key:
-        st.write("You need to provide an OpenAI API Key to use this app.")
-
-        st.markdown("You can get the key from [OpenAI](https://openai.com/).")
-
-        api_key = st.text_input("Enter your OpenAI API Key")
-
-        if api_key:
-            cookies["openaikey"] = api_key
-            cookies.save()
-            st.experimental_rerun()
-
-    if not api_key:
-        st.stop()
-
-    try:        
-        openai.api_key = api_key
-
+    try:
         video_id_or_url = st.text_input("Enter the url or id of the video to summarize")
 
         chunk_len_mins = st.number_input("Enter the length of the chunks to summarize in minutes", min_value=1, max_value=60, value=10)
