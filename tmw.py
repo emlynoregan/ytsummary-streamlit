@@ -69,10 +69,11 @@ def auth_with_tmw():
     info = None
     try:
         info = tmwcheck()
-        check_scope(tenant_id, "public", info)
-        authorized = True
+        authorized = has_scope(tenant_id, "public", info) or has_scope(tenant_id, "private", info)
     except UnauthorizedError as e:
         pass
+
+    # st.write(info)
 
     user = info and info.get("user")
     if user:
