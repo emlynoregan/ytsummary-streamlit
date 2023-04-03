@@ -2,9 +2,11 @@ import streamlit as st
 import requests
 from streamlit_cookies_manager import EncryptedCookieManager
 
-C_METALWIZARD_URL = "https://themetalwizard.net"
-C_API_URL = "https://qiuh5okg6pk3ie6m43n36s66vi0quait.lambda-url.us-east-1.on.aws/info"
-C_AUTH_URL_TEMPLATE = "https://themetalwizard.net/launch/{tenant_id}"
+# C_METALWIZARD_URL = "https://themetalwizard.net"
+# C_API_URL = "https://qiuh5okg6pk3ie6m43n36s66vi0quait.lambda-url.us-east-1.on.aws/info"
+# C_AUTH_URL_TEMPLATE = "https://themetalwizard.net/launch/{tenant_id}"
+C_API_URL = st.secrets["API_URL"]
+C_AUTH_URL_TEMPLATE = st.secrets["AUTH_URL_TEMPLATE"]
 
 def get_sign_up_url(force_sign_in=False):
     public_invite_url = st.secrets["PUBLIC_INVITE_URL"]
